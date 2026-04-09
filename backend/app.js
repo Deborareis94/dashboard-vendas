@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const Produto = require('./models/produto');
 const Campanha = require('./models/campanha');
@@ -10,18 +11,14 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 async function startServer() {
     try {
-
         await Produto.sync();
         await Campanha.sync();
         await Metrica.sync();
         await Venda.sync();
-
-        console.log('Todos os modelos sincronizados com sucesso!');
-
-       
 
         app.get('/produtos', async (req, res) => {
             try {
@@ -34,31 +31,15 @@ async function startServer() {
 
         app.post('/produtos', async (req, res) => {
             try {
-
                 const { nome, preco, estoque } = req.body;
-
-                const produtoExistente = await Produto.findOne({
-                    where: { nome }
-                });
-
+                const produtoExistente = await Produto.findOne({ where: { nome } });
                 if (produtoExistente) {
-
-                    produtoExistente.estoque =
-                        Number(produtoExistente.estoque) + Number(estoque);
-
+                    produtoExistente.estoque = Number(produtoExistente.estoque) + Number(estoque);
                     await produtoExistente.save();
-
                     return res.json(produtoExistente);
                 }
-
-                const novoProduto = await Produto.create({
-                    nome,
-                    preco,
-                    estoque
-                });
-
+                const novoProduto = await Produto.create({ nome, preco, estoque });
                 res.json(novoProduto);
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
@@ -66,17 +47,10 @@ async function startServer() {
 
         app.delete('/produtos/:id', async (req, res) => {
             try {
-
                 const produto = await Produto.findByPk(req.params.id);
-
-                if (!produto) {
-                    return res.status(404).json({ error: 'Produto não encontrado' });
-                }
-
+                if (!produto) return res.status(404).json({ error: 'Produto não encontrado' });
                 await produto.destroy();
-
                 res.json({ message: 'Produto deletado com sucesso' });
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
@@ -84,44 +58,29 @@ async function startServer() {
 
         app.put('/produtos/:id', async (req, res) => {
             try {
-
                 const produto = await Produto.findByPk(req.params.id);
-
-                if (!produto) {
-                    return res.status(404).json({ error: 'Produto não encontrado' });
-                }
-
+                if (!produto) return res.status(404).json({ error: 'Produto não encontrado' });
                 await produto.update(req.body);
-
                 res.json(produto);
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
         });
 
-        
-
         app.get('/produtos/estoque', async (req, res) => {
             try {
-
                 const produtos = await Produto.findAll({
                     attributes: ['nome', 'estoque'],
                     order: [['estoque', 'DESC']]
                 });
-
                 res.json(produtos);
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
         });
 
-       
-
         app.get('/produtos/valor', async (req, res) => {
             try {
-
                 const produtos = await Produto.findAll({
                     attributes: [
                         'nome',
@@ -129,15 +88,11 @@ async function startServer() {
                     ],
                     order: [[Produto.sequelize.literal('valor_total'), 'DESC']]
                 });
-
                 res.json(produtos);
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
         });
-
-       
 
         app.get('/campanhas', async (req, res) => {
             try {
@@ -157,8 +112,6 @@ async function startServer() {
             }
         });
 
-        
-
         app.get('/metricas', async (req, res) => {
             try {
                 const metricas = await Metrica.findAll();
@@ -176,8 +129,6 @@ async function startServer() {
                 res.status(500).json({ error: error.message });
             }
         });
-
-        
 
         app.get('/vendas', async (req, res) => {
             try {
@@ -197,29 +148,22 @@ async function startServer() {
             }
         });
 
-       
-
         app.get('/vendas/faturamento', async (req, res) => {
             try {
-
                 const vendas = await Venda.findAll();
-
-                const faturamento = vendas.reduce((total, v) => {
-                    return total + Number(v.valor);
-                }, 0);
-
+                const faturamento = vendas.reduce((total, v) => total + Number(v.valor), 0);
                 res.json({ faturamento });
-
             } catch (error) {
                 res.status(500).json({ error: error.message });
             }
         });
 
-       
-
-        app.listen(8081, () => {
-            console.log('Servidor rodando na porta 8081');
+        app.use((req, res) => {
+            res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
         });
+
+        const PORT = process.env.PORT || 8081;
+        app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
     } catch (err) {
         console.error('Erro ao sincronizar os modelos:', err);
