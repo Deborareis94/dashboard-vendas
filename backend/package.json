@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.20.0",
+    "recharts": "^3.8.1",
+    "sequelize": "^6.37.8"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
