@@ -1,17 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { Op } = require('sequelize');
 
 const Produto = require('./models/produto');
 const Campanha = require('./models/campanha');
 const Metrica = require('./models/metrica');
 const Venda = require('./models/venda');
 
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+
 
 async function startServer() {
     try {
@@ -20,7 +23,7 @@ async function startServer() {
         await Metrica.sync();
         await Venda.sync();
 
-        app.get('/produtos', async (req, res) => {
+        app.get('/api/produtos', async (req, res) => {
             try {
                 const produtos = await Produto.findAll();
                 res.json(produtos);
@@ -29,7 +32,7 @@ async function startServer() {
             }
         });
 
-        app.post('/produtos', async (req, res) => {
+        app.post('/api/produtos', async (req, res) => {
             try {
                 const { nome, preco, estoque } = req.body;
                 const produtoExistente = await Produto.findOne({ where: { nome } });
@@ -45,7 +48,7 @@ async function startServer() {
             }
         });
 
-        app.delete('/produtos/:id', async (req, res) => {
+        app.delete('/api/produtos/:id', async (req, res) => {
             try {
                 const produto = await Produto.findByPk(req.params.id);
                 if (!produto) return res.status(404).json({ error: 'Produto não encontrado' });
@@ -56,7 +59,7 @@ async function startServer() {
             }
         });
 
-        app.put('/produtos/:id', async (req, res) => {
+        app.put('/api/produtos/:id', async (req, res) => {
             try {
                 const produto = await Produto.findByPk(req.params.id);
                 if (!produto) return res.status(404).json({ error: 'Produto não encontrado' });
@@ -67,7 +70,7 @@ async function startServer() {
             }
         });
 
-        app.get('/produtos/estoque', async (req, res) => {
+        app.get('/api/produtos/estoque', async (req, res) => {
             try {
                 const produtos = await Produto.findAll({
                     attributes: ['nome', 'estoque'],
@@ -79,7 +82,7 @@ async function startServer() {
             }
         });
 
-        app.get('/produtos/valor', async (req, res) => {
+        app.get('/api/produtos/valor', async (req, res) => {
             try {
                 const produtos = await Produto.findAll({
                     attributes: [
@@ -94,7 +97,7 @@ async function startServer() {
             }
         });
 
-        app.get('/campanhas', async (req, res) => {
+        app.get('/api/campanhas', async (req, res) => {
             try {
                 const campanhas = await Campanha.findAll();
                 res.json(campanhas);
@@ -103,7 +106,7 @@ async function startServer() {
             }
         });
 
-        app.post('/campanhas', async (req, res) => {
+        app.post('/api/campanhas', async (req, res) => {
             try {
                 const campanha = await Campanha.create(req.body);
                 res.json(campanha);
@@ -112,7 +115,7 @@ async function startServer() {
             }
         });
 
-        app.get('/metricas', async (req, res) => {
+        app.get('/api/metricas', async (req, res) => {
             try {
                 const metricas = await Metrica.findAll();
                 res.json(metricas);
@@ -121,7 +124,7 @@ async function startServer() {
             }
         });
 
-        app.post('/metricas', async (req, res) => {
+        app.post('/api/metricas', async (req, res) => {
             try {
                 const metrica = await Metrica.create(req.body);
                 res.json(metrica);
@@ -130,7 +133,7 @@ async function startServer() {
             }
         });
 
-        app.get('/vendas', async (req, res) => {
+        app.get('/api/vendas', async (req, res) => {
             try {
                 const vendas = await Venda.findAll();
                 res.json(vendas);
@@ -139,16 +142,23 @@ async function startServer() {
             }
         });
 
-        app.post('/vendas', async (req, res) => {
-            try {
-                const venda = await Venda.create(req.body);
-                res.json(venda);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+      app.post ('/api/vendas', async (req, res) => {
+    try {
+        const hoje = new Date();
+        hoje.setHours(hoje.getUTCHours() - 3); 
+
+        const venda = await Venda.create({
+            ...req.body,
+            data: hoje
         });
 
-        app.get('/vendas/faturamento', async (req, res) => {
+        res.json(venda);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+        app.get('/api/vendas/faturamento', async (req, res) => {
             try {
                 const vendas = await Venda.findAll();
                 const faturamento = vendas.reduce((total, v) => total + Number(v.valor), 0);
@@ -158,9 +168,36 @@ async function startServer() {
             }
         });
 
-        app.use((req, res) => {
+     app.delete('/api/vendas/de-hoje', async (req, res) => {
+  try {
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+
+
+   
+    const deletadas = await Venda.destroy({
+      where: {
+        data: {
+          [Op.like]: `${dataFormatada}%`
+        }
+      }
+    });
+
+    res.json({ message: `${deletadas} vendas deletadas` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+      
+
+    app.use((req, res) => {
             res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
         });
+
+
 
         const PORT = process.env.PORT || 8081;
         app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

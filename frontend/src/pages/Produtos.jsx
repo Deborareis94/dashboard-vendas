@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const BASE_URL = "http://localhost:8081";
+
 
 function Produtos() {
 
@@ -17,7 +17,7 @@ function Produtos() {
   const [produtoEditando, setProdutoEditando] = useState(null);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/produtos`)
+    fetch(`/api/produtos`)
       .then(res => {
         if (!res.ok) throw new Error("Erro ao buscar produtos");
         return res.json();
@@ -33,7 +33,7 @@ function Produtos() {
   function adicionarProduto(e) {
     e.preventDefault();
 
-    fetch(`${BASE_URL}/produtos`, {
+    fetch(`/api/produtos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -41,7 +41,7 @@ function Produtos() {
       body: JSON.stringify({ nome, preco, estoque })
     })
     .then(() => {
-  return fetch(`${BASE_URL}/produtos`);
+  return fetch(`/api/produtos`);
 })
 .then(res => res.json())
 .then(data => {
@@ -53,7 +53,7 @@ function Produtos() {
   }
 
   function deletarProduto(id) {
-    fetch(`${BASE_URL}/produtos/${id}`, {
+    fetch(`/api/produtos/${id}`, {
       method: "DELETE"
     })
     .then(() => {
@@ -62,7 +62,7 @@ function Produtos() {
   }
 
   function editarProduto(id, novoNome, novoPreco, novoEstoque) {
-    fetch(`${BASE_URL}/produtos/${id}`, {
+    fetch(`/api/produtos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
