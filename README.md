@@ -1,42 +1,30 @@
-# Sistema de Gestão de Vendas
+# Pipeline de Vendas: Automação Full Stack com APIs & MySQL
 
-Aplicação full stack desenvolvida para controle de produtos, vendas e faturamento. O sistema permite cadastrar produtos, registrar vendas e acompanhar automaticamente o desempenho das vendas.
+##  Visão Geral
+Este projeto demonstra a implementação de um pipeline completo de vendas, integrando uma interface reativa em **React** a um ecossistema backend em **Node.js**. O objetivo principal é automatizar o fluxo de dados operacionais, garantindo que cada transação seja processada via **API** e armazenada em um banco **SQL** estruturado para análises estratégicas e tomada de decisão.
 
-## Funcionalidades
+## 🛠️ Tecnologias e Arquitetura
+- **Frontend:** React & Tailwind CSS (Interface otimizada para entrada de dados íntegros).
+- **Backend (API):** Node.js & Express (Processamento de regras de negócio e automação).
+- **Banco de Dados (SQL):** MySQL & Sequelize (Modelagem relacional e persistência de dados).
 
-- Cadastro, edição e exclusão de produtos  
-- Registro de vendas  
-- Atualização automática do estoque  
-- Cálculo automático de faturamento  
-- Filtro de vendas por data  
-- Indicador de estoque baixo  
+##  Funcionalidades e Engenharia
+- **Automação de Pipeline:** Registro de vendas com atualização automática de inventário e cálculo de faturamento em tempo real.
+- **Governança de Dados:** Validações de backend para garantir que apenas dados consistentes cheguem ao banco SQL.
+- **Inteligência de Estoque:** Algoritmo que identifica automaticamente o ponto de ressuprimento (estoque baixo).
+- **Consultas Estratégicas:** Filtros temporais via SQL que permitem a extração de dados para análise de sazonalidade.
 
-## Tecnologias utilizadas
+## Foco em Análise de Dados
+Diferente de um sistema comum, este pipeline foi projetado para servir como uma **fonte única de verdade (Single Source of Truth)**. A estrutura do banco MySQL permite:
+- Extração de métricas de faturamento bruto e líquido.
+- Análise de giro de produtos e performance de vendas.
+- Base sólida para integração com ferramentas de BI (Power BI/Tableau).
 
-Frontend: React, Tailwind CSS  
-Backend: Node.js, Express  
-Banco de dados: MySQL, Sequelize  
+##  Objetivos de Aprendizado
+- Desenvolvimento de APIs RESTful integradas a bancos relacionais.
+- Manipulação de estados complexos no Frontend para gestão de estoque.
+- Implementação de lógica de automação de faturamento no lado do servidor.
+- Versionamento e documentação técnica voltada para engenharia de dados.
 
-## Sobre o projeto
-
-Este projeto foi desenvolvido com o objetivo de praticar desenvolvimento full stack, integrando frontend, backend e banco de dados.
-
-A aplicação também utiliza automações internas, como atualização de estoque e cálculo de faturamento em tempo real, simulando um sistema real.
-
-## Como executar
-
-Clone o repositório:
-git clone https://github.com/seu-usuario/seu-repositorio.git
-
-Instale as dependências:
-
-Frontend:
-cd frontend
-npm install
-npm run dev
-
-Backend:
-cd backend
-npm install
-node app.js
-
+---
+*Projeto desenvolvido para fins de portfólio, focando na união entre Desenvolvimento Full Stack e Inteligência de Dados.*
